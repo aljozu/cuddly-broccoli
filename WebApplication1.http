@@ -1,0 +1,36 @@
+﻿@WebApplication1_HostAddress = http://localhost:5286
+
+POST {{WebApplication1_HostAddress}}/todoitems
+Content-Type: application/json
+
+{
+  "name":"walk dog",
+  "isComplete":true
+}
+
+
+###
+
+GET {{WebApplication1_HostAddress}}/todoitems
+
+###
+
+GET {{WebApplication1_HostAddress}}/todoitems/1
+
+###
+
+GET {{WebApplication1_HostAddress}}/todoitems/complete
+
+###
+
+PUT {{WebApplication1_HostAddress}}/todoitems/1
+Content-Type: application/json
+{
+  "name": "feed fish",
+  "isComplete": false
+}
+###
+
+DELETE {{WebApplication1_HostAddress}}/todoitems/1
+
+###

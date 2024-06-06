@@ -1,0 +1,83 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .todo-item {
+            margin-bottom: 10px;
+        }
+
+        .completed {
+            text-decoration: line-through;
+        }
+
+        button {
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Todo List</h1>
+    <div>
+        <input type="text" id="new-todo-name" placeholder="Enter new todo">
+        <button onclick="createTodo()">Add Todo</button>
+    </div>
+    <h2>All Todos</h2>
+    <div id="todo-list"></div>
+
+    <script>
+        async function fetchTodos() {
+            const response = await fetch('/todoitems');
+            const todos = await response.json();
+            const todoList = document.getElementById('todo-list');
+            todoList.innerHTML = '';
+            todos.forEach(todo => {
+                const todoItem = document.createElement('div');
+                todoItem.className = 'todo-item' + (todo.isComplete ? ' completed' : '');
+                todoItem.innerHTML = `
+                    <span>${todo.name}</span>
+                    <button onclick="toggleComplete(${todo.id}, ${todo.isComplete})">Toggle Complete</button>
+                    <button onclick="deleteTodo(${todo.id})">Delete</button>
+                `;
+                todoList.appendChild(todoItem);
+            });
+        }
+
+        async function createTodo() {
+            const name = document.getElementById('new-todo-name').value;
+            if (!name) return alert('Please enter a name');
+            await fetch('/todoitems', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, isComplete: false })
+            });
+            document.getElementById('new-todo-name').value = '';
+            fetchTodos();
+        }
+
+        async function toggleComplete(id, isComplete) {
+            await fetch(`/todoitems/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ isComplete: !isComplete })
+            });
+            fetchTodos();
+        }
+
+        async function deleteTodo(id) {
+            await fetch(`/todoitems/${id}`, { method: 'DELETE' });
+            fetchTodos();
+        }
+
+        // Initial fetch of todos when the page loads
+        fetchTodos();
+    </script>
+</body>
+</html>
